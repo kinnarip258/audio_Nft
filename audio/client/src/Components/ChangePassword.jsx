@@ -4,7 +4,10 @@ import React from 'react'
 import {useFormik} from "formik";
 import * as Yup from 'yup';
 import { useDispatch} from 'react-redux';
-
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { changePassword } from '../Actions/actions';
+toast.configure();
 //========================== Import Modules End =============================
 
 //============================= Login Component Start =============================
@@ -29,13 +32,18 @@ const ChangePassword = () => {
           .min(8, 'Too Short!')
           .max(100, 'Too Long!')
           .required('Required'),
-        conformPassword: Yup.string()
+        confirmPassword: Yup.string()
           .min(8, 'Too Short!')
           .max(100, 'Too Long!')
           .required('Required'), 
       }),
       onSubmit: (values) => {
-        dispatch()
+        if(values.newPassword !== values.confirmPassword){
+          toast.warning("Password Not Match", { position: toast.POSITION.TOP_CENTER, autoClose: 2000 })
+        }
+        else{
+          dispatch(changePassword(values))
+        }
       }
   })
   return (

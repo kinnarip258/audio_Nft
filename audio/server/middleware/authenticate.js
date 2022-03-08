@@ -13,7 +13,7 @@ const Authenticate = async (req,res, next) => {
     try{
         //============================= Get Cookie =============================
 
-        const token = req.cookies.blog;
+        const token = req.cookies.audioNft;
 
         //============================= Verify Token =============================
 

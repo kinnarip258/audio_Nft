@@ -3,6 +3,8 @@
 import React, {useState, useEffect} from "react";
 import {useFormik} from "formik";
 import { useDispatch, useSelector } from 'react-redux';
+import TextareaAutosize from '@mui/base/TextareaAutosize';
+import Checkbox from "./Checkbox";
 import * as Yup from 'yup';
 import {useHistory} from "react-router-dom";
 import { toast } from 'react-toastify';
@@ -27,11 +29,20 @@ const SignUp = () => {
     const Toggle = useSelector(state => state.Toggle);
     const Loading = useSelector(state => state.Loading);
     
+    const [genres, setGenres] = useState([]);
+    
+    const handleClick = (e) => {
+        const { id, checked } = e.target;
+        setGenres([...genres, id]);
+        if (!checked) {
+          setGenres(genres.filter((item) => item !== id));
+        }
+    };
     //============================= UseFormik =============================
     const formik = useFormik({
         //============================= Initial Values =============================
         initialValues: {
-          firstName:"", lastName:"", email:"", phone:"", username:"", password:"" , cpassword:"", role:""
+          firstName:"", lastName:"", email:"", bio:"", username:"", password:"" , cpassword:"", role:""
         },
         validationSchema: Yup.object().shape({
             firstName: Yup.string()
@@ -44,9 +55,9 @@ const SignUp = () => {
               .required('Required'),
             email: Yup.string().email('Invalid email').required('Required'),
             role: Yup.string().required('Required'),
-            phone: Yup.string()
+            bio: Yup.string()
               .min(10, 'Too Short!')
-              .max(12, 'Too Long!')
+              .max(500, 'Too Long!')
               .required('Required'),
             username: Yup.string()
               .min(3, 'Too Short!')
@@ -54,12 +65,18 @@ const SignUp = () => {
               .required('Required'), 
             password: Yup.string()
               .min(8, 'Too Short!')
-              .max(100, 'Too Long!')
-              .required('Required'),  
+              .required('Required')
+              .matches(
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
+                "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
+                ),  
             cpassword: Yup.string()
               .min(8, 'Too Short!')
-              .max(100, 'Too Long!')
-              .required('Required'), 
+              .required('Required')
+              .matches(
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
+                "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
+                ), 
         }),
         onSubmit: (values) => {
             
@@ -67,7 +84,7 @@ const SignUp = () => {
                 toast.warning("Password Not Match")
             }
             else{
-                dispatch(signUpUser(values))
+                dispatch(signUpUser(values, genres))
             }
         }
     })
@@ -91,7 +108,7 @@ const SignUp = () => {
             </div>
             <div class="login-page">
                 <div className="header_div">
-                    <h1>Registration Form</h1>
+                    <h1> Artist Form</h1>
                 </div>
         
                 <div class="form">
@@ -99,7 +116,6 @@ const SignUp = () => {
 
                     <select {...formik.getFieldProps("role")} value={formik.values.role}  name="role">
                         <option>Select Role...</option>
-                        <option value={"Admin"}>Admin</option>
                         <option value={"Artist"}>Artist</option>
                     </select>
                     {formik.errors.role && formik.touched.role ? (
@@ -121,11 +137,27 @@ const SignUp = () => {
                         <div className = "error">{formik.errors.email}</div>
                     ) : null}
                     
-                    <input {...formik.getFieldProps("phone")} value={formik.values.phone}  name="phone"  type="number" placeholder="Phone Number"/>
-                    {formik.errors.phone && formik.touched.phone ? (
-                        <div className = "error">{formik.errors.phone}</div>
+                    <TextareaAutosize
+                        maxRows={5}
+                        aria-label="maximum height"
+                        placeholder="Bio ..."
+                        style={{ width: 350 }}
+                        {...formik.getFieldProps("bio")} value={formik.values.bio}  name="bio"
+                    />
+                    {formik.errors.bio && formik.touched.bio ? (
+                        <div className = "error">{formik.errors.bio}</div>
                     ) : null}
-        
+
+                    <h2>Genres</h2>
+                    <label>rock</label><Checkbox type='checkbox' id={"rock"} handleClick = {handleClick} isChecked={genres.includes('rock')}/>
+                    <label>R & B</label><Checkbox type='checkbox' id={"R & B"} handleClick = {handleClick} isChecked={genres.includes('R & B')}/> 
+                    <label>country</label><Checkbox type='checkbox' id={"country"} handleClick = {handleClick} isChecked={genres.includes('country')}/> 
+                    <label>hip-hop</label><Checkbox type='checkbox' id={"hip-hop"} handleClick = {handleClick} isChecked={genres.includes('hip-hop')}/>  
+                    <label>jazz</label><Checkbox type='checkbox' id={"jazz"} handleClick = {handleClick} isChecked={genres.includes('jazz')}/> 
+                    <label>soulMusic</label><Checkbox type='checkbox' id={"soul music"} handleClick = {handleClick} isChecked={genres.includes('soul music')}/> 
+                    <label>danceMusic</label><Checkbox type='checkbox' id={"dance music"} handleClick = {handleClick} isChecked={genres.includes('dance music')}/> 
+                    <label>pop</label><Checkbox type='checkbox' id={"pop"} handleClick = {handleClick} isChecked={genres.includes('pop')}/> 
+
                     <input {...formik.getFieldProps("username")} value={formik.values.username}  name="username"  type="text" placeholder="Username"/>
                     {formik.errors.username && formik.touched.username ? (
                         <div className = "error">{formik.errors.username}</div>

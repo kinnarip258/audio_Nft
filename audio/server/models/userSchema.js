@@ -11,27 +11,64 @@ const jwt = require('jsonwebtoken');
 //============================= Model Schema Of User =============================
 
 const userSchema = new mongoose.Schema({
+
     firstName: {
         type: String,
+        required: true
     },
     lastName: {
         type: String,
+        required: true
     },
     email: {
         type: String,
+        required: true
     },
-    phone: {
-        type: Number,
+    bio: {
+        type: String,
     },
     username: {
         type: String,
+        required: true
     },
     password: {
         type: String,
+        required: true
     },
     role: {
         type: String,
+        required: true
     },
+    genres: [
+        {
+            type: String,
+            required: true
+        }
+    ],
+    NFT: [
+        {
+            title: {
+                type: String,
+                required: true
+            },
+            description: {
+                type: String,
+                required: true
+            },
+            coverImage: {
+                type: String,
+                required: true
+            },
+            audioFile: {
+                type: String,
+                required: true
+            },
+            price: {
+                type: String,
+                required: true
+            }
+        }
+    ],
     Tokens: [
         {
             token: {
@@ -49,8 +86,7 @@ const userSchema = new mongoose.Schema({
 //============================= Hashing Password =============================
 userSchema.pre('save', async function(next) {
     if(this.isModified('password')) {
-        this.password = await bcrypt.hash(this.password, 12);
-        this.cpassword = await bcrypt.hash(this.cpassword, 12);
+        this.password = await bcrypt.hash(this.password, 10);
     }
     next();
 });

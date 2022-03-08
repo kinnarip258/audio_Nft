@@ -3,8 +3,6 @@
 //========================== Load internal Module =========================
 
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 
 //========================== Load Modules End =============================
 
@@ -15,7 +13,7 @@ const genresSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    discription: {
+    description: {
         type: String,
         required: true
     },

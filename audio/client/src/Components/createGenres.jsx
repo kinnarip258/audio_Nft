@@ -1,11 +1,12 @@
 //========================== Import Modules Start ===========================
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import {useFormik} from "formik";
 import * as Yup from 'yup';
-import { useDispatch} from 'react-redux';
+import { useDispatch, useSelector} from 'react-redux';
 import TextareaAutosize from '@mui/base/TextareaAutosize';
-
+import {createGenres} from '../Actions/actions';
+import { useHistory } from 'react-router-dom';
 //========================== Import Modules End =============================
 
 //============================= Login Component Start =============================
@@ -15,6 +16,9 @@ const CreateGenres = () => {
   //============================= dispatch Api Request =============================
   const dispatch = useDispatch();
 
+  const Toggle = useSelector(state => state.Toggle);
+
+  const history = useHistory();
   //============================= UseFormik =============================
   const formik = useFormik({
       //============================= Initial Values =============================
@@ -32,14 +36,20 @@ const CreateGenres = () => {
           .required('Required'),  
       }),
       onSubmit: (values) => {
-        
+        dispatch(createGenres(values));
       }
   })
+
+  useEffect(() => {
+    if(Toggle === true){
+      history.push('/genres');
+    }
+  }, [Toggle])
   return (
     <div>
         <div class="login-page">
             <div className="header_div">
-              <h1>Login Form</h1>
+              <h1>Create Genres</h1>
             </div> 
             <div class="form">
               <form class="login-form" onSubmit={formik.handleSubmit}>

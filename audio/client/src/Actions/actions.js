@@ -1,6 +1,6 @@
 //========================== Import Modules Start ===========================
 
-import {SignIn_User, SignUp_Toggle, Logout_User, Loading, Sign, SignUp_User} from "./actionTypes";
+import {SignIn_User, SignUp_Toggle, Logout_User, Loading, SignUp_User, Get_All_Artists, Get_All_Genres, Admin_Profile, Change_Password, Edit_Admin,Edit_Genres, Delete_Genres, Create_Genres, Create_Nft, Loading_Error, Upload_AudioFile, Upload_CoverImg, PlayList} from "./actionTypes";
 import Axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,12 +12,13 @@ toast.configure();
 
 //============================= Register User Action Start =============================
 
-export const signUpUser = (values) => {
+export const signUpUser = (values, genres) => {
 
     return (dispatch) => {
 
-        Axios.post(`/signUp`, values)
-        .then(() => {
+        Axios.post(`/signUp`, {values,genres})
+        .then((res) => {
+            toast.success(`${res.data.msg}`, { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
             dispatch({type: SignUp_User})
         })
         .catch(err => {
@@ -45,7 +46,6 @@ export const signInUser = (values) => {
     return (dispatch) => {
         Axios.post(`/signIn`, values)
         .then((res) => {
-            console.log(res.data.msg);
             toast.success(`${res.data.msg}`, { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
             dispatch({type: SignIn_User})
         })
@@ -58,13 +58,245 @@ export const signInUser = (values) => {
 
 //============================= End =============================
 
+//============================= Register User Action Start =============================
+
+export const getAllArtists = (Page) => {
+
+    return (dispatch) => {
+
+        Axios.get(`/getAllArtists/?Page=${Page}`)
+        .then((res) => {
+            dispatch({type: Get_All_Artists, payload: res.data})
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    }
+}
+
+//============================= End =============================
+
+//============================= Register User Action Start =============================
+
+export const getAllGenres = (Page) => {
+
+    return (dispatch) => {
+
+        Axios.get(`/getAllGenres/?Page=${Page}`)
+        .then((res) => {
+            dispatch({type: Get_All_Genres, payload: res.data})
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    }
+}
+
+//============================= End =============================
+
+//============================= Register User Action Start =============================
+
+export const adminProfile = () => {
+
+    return (dispatch) => {
+
+        Axios.get(`/adminProfile`)
+        .then((res) => {
+            dispatch({type: Admin_Profile, payload: res.data})
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    }
+}
+
+//============================= End =============================
+
+//============================= Register User Action Start =============================
+
+export const changePassword = (values) => {
+
+    return (dispatch) => {
+
+        Axios.post(`/changePassword`, values)
+        .then((res) => {
+            toast.success(`${res.data.msg}`, { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
+            dispatch({type: Change_Password})
+        })
+        .catch(err => {
+            toast.error("Email Or Username Already Exist!", { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
+        })
+    }
+}
+
+//============================= End =============================
+
+//============================= Register User Action Start =============================
+
+export const editAdmin = (values) => {
+
+    return (dispatch) => {
+
+        Axios.put(`/editAdmin`, values)
+        .then((res) => {
+            toast.success(`${res.data.msg}`, { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
+            dispatch({type: Edit_Admin})
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    }
+}
+
+//============================= End =============================
+
+//============================= Register User Action Start =============================
+
+export const editGenres = (values) => {
+
+    return (dispatch) => {
+
+        Axios.put(`/editGenres`, values)
+        .then((res) => {
+            toast.success(`${res.data.msg}`, { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
+            dispatch({type: Edit_Genres})
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    }
+}
+
+//============================= End =============================
+
+//============================= Register User Action Start =============================
+
+export const deleteGenres = (id) => {
+
+    return (dispatch) => {
+
+        Axios.delete(`/deleteGenres/?Id=${id}`)
+        .then((res) => {
+            toast.success(`${res.data.msg}`, { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
+            dispatch({type: Delete_Genres})
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    }
+}
+
+//============================= End =============================
+
+//============================= Register User Action Start =============================
+
+export const createGenres = (values) => {
+
+    return (dispatch) => {
+
+        Axios.post(`/createGenres`, values)
+        .then((res) => {
+            toast.success(`${res.data.msg}`, { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
+            dispatch({type: Create_Genres})
+        })
+        .catch(err => {
+            toast.error("Genres Is Already Exist!", { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
+        })
+    }
+}
+
+//============================= End =============================
+
+//============================= Register User Action Start =============================
+
+export const createNft = (userId, values, AudioFile, CoverImg) => {
+
+    return (dispatch) => {
+
+        Axios.post(`/createNft/?Id=${userId}`, {values, AudioFile, CoverImg})
+        .then((res) => {
+            toast.success(`${res.data.msg}`, { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
+            dispatch({type: Create_Nft})
+        })
+        .catch(err => {
+            dispatch({type: Loading_Error})
+            
+            toast.error("Nft Title Is Already Exist!", { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
+            
+        })
+    }
+}
+
+//============================= End =============================
+
+
+//============================= Register User Action Start =============================
+
+export const uploadCoverImg = (values) => {
+
+    return (dispatch) => {
+
+        Axios.post(`/uploadImg`, values)
+        .then((res) => {
+            dispatch({type: Upload_CoverImg, payload: res.data})
+        })
+        .catch(error => {
+            dispatch({type: Loading_Error});
+
+            toast.error("File Is Not An Image file!", { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
+            
+        })
+    }
+}
+
+//============================= End =============================
+
+//============================= Register User Action Start =============================
+
+export const uploadAudioFile = (values) => {
+
+    return (dispatch) => {
+
+        Axios.post(`/uploadAudioFile`, values)
+        .then((res) => {
+            dispatch({type: Upload_AudioFile, payload: res.data})
+        })
+        .catch(err => {
+            dispatch({type: Loading_Error})
+
+            toast.error("File Is Not An Audio file!", { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
+            
+        })
+    }
+}
+
+//============================= End =============================
+
+//============================= PlayList Action Start =============================
+
+export const playList = () => {
+
+    return (dispatch) => {
+        Axios.get(`/playList`)
+        .then((res) => {
+            dispatch({type: PlayList, payload: res.data})
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    }
+}
+
+//============================= End =============================
+
+
 //============================= Logout Action Start =============================
 
 export const logout = () => {
 
     return (dispatch) => {
         Axios.get(`/logout`)
-        .then((res) => {
+        .then(() => {
             dispatch({type: Logout_User})
             toast.success(`Logout Successfully!`, { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
         })
