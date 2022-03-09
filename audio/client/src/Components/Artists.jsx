@@ -51,7 +51,7 @@ const Artists = () => {
         }
       </div>
       <div className="pagination2">
-      <Pagination count={ArtistPage} variant="outlined" color="secondary" onChange={(e, value) =>  {
+      <Pagination count={ArtistPage} variant="outlined" color="primary" onChange={(e, value) =>  {
         setPageNumber(value) }}/>  
     </div>
     </>

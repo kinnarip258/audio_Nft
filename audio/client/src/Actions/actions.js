@@ -1,6 +1,6 @@
 //========================== Import Modules Start ===========================
 
-import {SignIn_User, SignUp_Toggle, Logout_User, Loading, SignUp_User, Get_All_Artists, Get_All_Genres, Admin_Profile, Change_Password, Edit_Admin,Edit_Genres, Delete_Genres, Create_Genres, Create_Nft, Loading_Error, Upload_AudioFile, Upload_CoverImg, PlayList} from "./actionTypes";
+import {SignIn_User, Logout_User, Loading, SignUp_User, Get_All_Artists, Get_All_Genres, Admin_Profile, Change_Password, Edit_Admin,Edit_Genres, Delete_Genres, Create_Genres, Create_Nft, Loading_Error, Upload_AudioFile, Upload_CoverImg, PlayList, Get_Count_ArtistGenres} from "./actionTypes";
 import Axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -28,15 +28,6 @@ export const signUpUser = (values, genres) => {
     }
 }
 
-//============================= End =============================
-
-//============================= Register Toggle Action Start =============================
-export const signUpToggle = () => {
-
-    return (dispatch) => {
-        dispatch({type: SignUp_Toggle})        
-    }
-}
 //============================= End =============================
 
 //============================= Login Action Start =============================
@@ -152,11 +143,11 @@ export const editAdmin = (values) => {
 
 //============================= Register User Action Start =============================
 
-export const editGenres = (values) => {
+export const editGenres = (values, id) => {
 
     return (dispatch) => {
 
-        Axios.put(`/editGenres`, values)
+        Axios.put(`/editGenres/?Id=${id}`, values)
         .then((res) => {
             toast.success(`${res.data.msg}`, { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
             dispatch({type: Edit_Genres})
@@ -289,6 +280,22 @@ export const playList = () => {
 
 //============================= End =============================
 
+//============================= Get Count of Artist and Genres Action Start =============================
+
+export const getCountArtistGenres = () => {
+
+    return (dispatch) => {
+        Axios.get(`/getCountArtistGenres`)
+        .then((res) => {
+            dispatch({type: Get_Count_ArtistGenres, payload: res.data})
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    }
+}
+
+//============================= End =============================
 
 //============================= Logout Action Start =============================
 

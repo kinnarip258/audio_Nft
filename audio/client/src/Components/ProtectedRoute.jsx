@@ -8,7 +8,7 @@ import {Route, Redirect} from 'react-router-dom';
 //============================= Protected Route Component Start =============================
 
 const ProtectedRoute = ({authStatus, component: Component, ...rest}) => { 
-
+    
     return (
         <>  
             <Route {...rest} render= {(props) => {

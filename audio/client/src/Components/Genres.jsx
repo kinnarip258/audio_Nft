@@ -15,6 +15,7 @@ const Genres = () => {
   const [pageNumber, setPageNumber] = useState(1);
 
 
+  
   const handleDelete = (id) => {
     dispatch(deleteGenres(id))
   }
@@ -22,7 +23,7 @@ const Genres = () => {
   useEffect(() => {
     dispatch(getAllGenres(pageNumber))
   }, [dispatch, pageNumber, Toggle]);
-  
+ 
   return (
     <>
     <div className='header_div'>
@@ -40,7 +41,7 @@ const Genres = () => {
                 {
                   User.role === "Admin" ? (
                     <>
-                      <NavLink to='/dashboard'><button>Edit</button></NavLink>
+                      <NavLink to={`/EditGenres/:?id=${genres._id}`}><button>Edit</button></NavLink>
                       <button onClick={() => handleDelete(genres._id)}>Delete</button>
                     </>
                   ) : null
@@ -52,7 +53,7 @@ const Genres = () => {
       }
     </div>
     <div className="pagination2">
-      <Pagination count={GenresPage} variant="outlined" color="secondary" onChange={(e, value) =>  {
+      <Pagination count={GenresPage} variant="outlined" color="primary" onChange={(e, value) =>  {
         setPageNumber(value) }}/>  
     </div>
     

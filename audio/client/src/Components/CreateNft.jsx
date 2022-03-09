@@ -75,7 +75,7 @@ const CreateNft = () => {
 
     useEffect(() => {
       if(Toggle === true){
-        history.push('/dashboard');
+        history.push('/');
       }
     })
   return (

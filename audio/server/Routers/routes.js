@@ -18,9 +18,9 @@ const path = require('path');
 
 router.post('/signUp', async (req,res) => {
  
-    console.log(req.body);
-    const {firstName, lastName, email , bio, username, password, role} = req.body.values;
+    const {firstName, lastName, email , bio, username, password} = req.body.values;
     const genres = req.body.genres;
+    const role = "Artist";
 
     try {
         const emailExist = await User.findOne({email: email});
@@ -101,7 +101,7 @@ router.get('/adminProfile', authenticate, async (req,res) => {
         
         //============================= Send Login User =============================
         res.send(LoginUser);
-
+        
     }
     catch(err){
         //============================= Send Error Message =============================
@@ -143,14 +143,14 @@ router.get('/getAllArtists', async (req,res) => {
     try{
 
         const Page = req.query.Page;
-        const Limit = 5;
+        const Limit = 2;
         let skip = (Page-1) * Limit;
 
         //============================= Count Total Documents =============================
         const total = await User.countDocuments({});
         
         //============================= Count Total Pages =============================
-        let totalPage = Math.ceil(total /Limit);
+        let totalPage = Math.ceil((total - 1) /Limit);
         let aggregateQuery = [];
 
         aggregateQuery.push(
@@ -197,22 +197,29 @@ router.get('/getAllGenres', async (req,res) => {
         //============================= Count Total Pages =============================
         let totalPage = Math.ceil(total/Limit);
 
-        aggregateQuery.push(
-            {
-                $sort: { createAt: -1}
-            },
-            //============================= Pagination =============================
-            {
-                $skip: skip
-            },
-            {
-                $limit: Limit
-            }  
-        );
+        if(Page === "") {
+            const genres = await Genres.find();
 
-        const genres = await Genres.aggregate([aggregateQuery]);
+            res.send({genres})
+        }
+        else {
+            aggregateQuery.push(
+                {
+                    $sort: { createAt: -1}
+                },
+                //============================= Pagination =============================
+                {
+                    $skip: skip
+                },
+                {
+                    $limit: Limit
+                }  
+            );  
+            
+            const genres = await Genres.aggregate([aggregateQuery]);
         
-        res.send({genres, totalPage});
+            res.send({genres, totalPage});
+        }
         
     }
     catch(err){
@@ -235,8 +242,7 @@ router.post('/changePassword', authenticate, async (req,res) => {
         if(MatchPassword){
             password = await bcrypt.hash(newPassword, 10);
 
-            const set = await User.findOneAndUpdate({username: user.username}, password);
-            console.log("set", set);
+            await User.findOneAndUpdate({username: user.username}, password);
 
             res.send({msg: "Password Change Successfully!"})
         }
@@ -257,8 +263,13 @@ router.post('/changePassword', authenticate, async (req,res) => {
 router.put('/editAdmin', authenticate, async (req,res) => {
     try{
 
-        
-        
+        //============================= Save Employee Updated Details =============================
+        await User.findOneAndUpdate({username: req.authenticateUser.username}, req.body, {
+            new: false
+        });
+
+        res.send({msg: 'Admin Profile Updated!'});
+
     }
     catch(err){
         //============================= Send Error Message =============================
@@ -270,9 +281,14 @@ router.put('/editAdmin', authenticate, async (req,res) => {
 
 router.put('/editGenres', authenticate, async (req,res) => {
     try{
+        const Id = req.query.Id;
+        
+        //============================= Save Employee Updated Details =============================
+        await Genres.findOneAndUpdate({_id: Id}, req.body, {
+            new: false
+        });
 
-        
-        
+        res.send({msg: 'Genres Updated!'})
     }
     catch(err){
         //============================= Send Error Message =============================
@@ -297,6 +313,35 @@ router.delete('/deleteGenres', authenticate, async (req,res) => {
     }
 });
 
+//============================= Get Count Of Artist And Genres =============================
+ 
+router.get('/getCountArtistGenres', authenticate, async (req,res) => {
+    try{
+        const aggregateQuery = [];
+
+        aggregateQuery.push(
+            {
+                $match: {
+                    role: "Artist"
+                }
+            }
+        )
+
+        const artists = await User.aggregate([aggregateQuery]);
+
+        const ArtistCount = artists.length;
+
+        const genres = await Genres.find();
+        const GenresCount = genres.length;
+        
+        res.send({ArtistCount, GenresCount});
+    }
+    catch(err){
+        //============================= Send Error Message =============================
+        res.send(err)
+    }
+});
+
 //============================= Get PlayList =============================
 
 router.get('/playList', async (req,res) => {
@@ -307,6 +352,11 @@ router.get('/playList', async (req,res) => {
         aggregateQuery.push(
             {
                 $unwind: "$NFT"
+            },
+            {
+                $sort: {
+                    "NFT.createAt": -1
+                }
             }
         );
 
@@ -337,7 +387,6 @@ router.post('/createNft', authenticate, upload.single('image') , async (req,res)
         await User.findOneAndUpdate({_id: userId}, {$push: {NFT: Nft}})
         
         res.send({msg: " Audio Nft Created Successfully! "})
-        
     }
     catch(err){
         //============================= Send Error Message =============================
@@ -394,9 +443,7 @@ router.post('/uploadAudioFile', authenticate, upload.single('audio') , async (re
 
             res.send(audioFile);
 
-        }
-
-        
+        }   
     }
     catch(err){
         //============================= Send Error Message =============================

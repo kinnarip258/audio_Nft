@@ -1,6 +1,6 @@
 //========================== Import Modules Start ===========================
 
-import { SignIn_User, SignUp_Toggle, Logout_User, Loading, SignUp_User, Get_All_Artists, Get_All_Genres, Admin_Profile, Change_Password, Edit_Admin, Edit_Genres, Delete_Genres, Create_Genres, Create_Nft, Upload_CoverImg, Upload_AudioFile, Loading_Error, PlayList } from "../Actions/actionTypes";
+import { SignIn_User, Logout_User, Loading, SignUp_User, Get_All_Artists, Get_All_Genres, Admin_Profile, Change_Password, Edit_Admin, Edit_Genres, Delete_Genres, Create_Genres, Create_Nft, Upload_CoverImg, Upload_AudioFile, Loading_Error, PlayList, Get_Count_ArtistGenres } from "../Actions/actionTypes";
 
 //========================== Import Modules End =============================
 
@@ -16,7 +16,9 @@ const initialState = {
     Nft: [],
     AudioFile:[],
     CoverImg:[],
-    Playlist: []
+    Playlist: [],
+    ArtistCount: "",
+    GenresCount: ""
 }
 
 const Reducer = (state = initialState, action) => {
@@ -26,13 +28,6 @@ const Reducer = (state = initialState, action) => {
             return{
                 ...state,
                 Toggle: true, 
-            }
-
-        case SignUp_Toggle: 
-
-            return{
-                ...state,
-                Toggle: false,
             }
 
         case SignIn_User:
@@ -74,11 +69,13 @@ const Reducer = (state = initialState, action) => {
         case Edit_Admin: 
             return {
                 ...state,
+                Toggle: true
             }
 
         case Edit_Genres: 
             return {
                 ...state,
+                Toggle: true
             }
 
         case Delete_Genres: 
@@ -109,7 +106,7 @@ const Reducer = (state = initialState, action) => {
             }
         
         case Upload_AudioFile:
-            console.log(action.payload);
+           
             return {
                 ...state,
                 AudioFile: action.payload
@@ -125,7 +122,14 @@ const Reducer = (state = initialState, action) => {
                 Genres : [],
                 User: [],
             }
-         
+        
+        case Get_Count_ArtistGenres:
+            return {
+                ...state,
+                ArtistCount: action.payload.ArtistCount,
+                GenresCount: action.payload.GenresCount
+            }
+            
         case Loading: 
             return {
                 ...state,

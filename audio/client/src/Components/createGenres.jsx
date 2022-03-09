@@ -1,12 +1,14 @@
 //========================== Import Modules Start ===========================
 
-import React, { useEffect } from 'react'
+import React, { useEffect , useState} from 'react'
 import {useFormik} from "formik";
 import * as Yup from 'yup';
 import { useDispatch, useSelector} from 'react-redux';
 import TextareaAutosize from '@mui/base/TextareaAutosize';
-import {createGenres} from '../Actions/actions';
+import {createGenres, editGenres, getAllGenres} from '../Actions/actions';
 import { useHistory } from 'react-router-dom';
+import queryString from "query-string";
+
 //========================== Import Modules End =============================
 
 //============================= Login Component Start =============================
@@ -17,6 +19,13 @@ const CreateGenres = () => {
   const dispatch = useDispatch();
 
   const Toggle = useSelector(state => state.Toggle);
+  const Genres = useSelector(state => state.Genres);
+
+  //============================= Get Edited User Id =============================
+  const {id} = queryString.parse(window.location.search);
+
+  //============================= Store Edite Employee Data =============================
+  const [editedObject,setEditedObject] = useState([]);
 
   const history = useHistory();
   //============================= UseFormik =============================
@@ -36,7 +45,12 @@ const CreateGenres = () => {
           .required('Required'),  
       }),
       onSubmit: (values) => {
-        dispatch(createGenres(values));
+        if(id) {
+          dispatch(editGenres(values, id))
+        }
+        else {
+          dispatch(createGenres(values));
+        }
       }
   })
 
@@ -44,12 +58,34 @@ const CreateGenres = () => {
     if(Toggle === true){
       history.push('/genres');
     }
-  }, [Toggle])
+  }, [Toggle]);
+
+  //============================= UseEffect For Get EditUser Data =============================
+  useEffect(() => {
+    if(id){
+        //============================= get Edited User Data =============================
+        const editUser = Genres.find((ele) => ele._id === id ? ele : null);
+        setEditedObject(editUser);
+    }
+  },[id, Genres]);
+
+  //============================= Set Edited User Data to InitialValues =============================
+  useEffect(() => {
+    if(id && editedObject) {
+        //setvalues
+        formik.setValues(editedObject)
+    }
+  },[editedObject]);
+
+  useEffect(() => {
+    dispatch(getAllGenres(""))
+  }, [dispatch])
+
   return (
     <div>
         <div class="login-page">
             <div className="header_div">
-              <h1>Create Genres</h1>
+              <h1>{id ? "Edit Genres" : "Create Genres"}</h1>
             </div> 
             <div class="form">
               <form class="login-form" onSubmit={formik.handleSubmit}>
@@ -70,7 +106,7 @@ const CreateGenres = () => {
               {formik.errors.description && formik.touched.description ? (
                 <div className = "error">{formik.errors.description}</div>
               ) : null}
-              <button type="submit">Submit</button>
+              <button type="submit">{id ? "Update" : "Submit"}</button>
               </form>
             </div>
         </div>

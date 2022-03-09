@@ -7,7 +7,6 @@
 //============================= Export Action Types Start =============================
 
 export const SignUp_User = "SignUp_User";
-export const SignUp_Toggle = "SignUp_Toggle";
 export const SignIn_User = "SignIn_User";
 export const Logout_User = "Logout_User";
 export const Loading = "Loading";
@@ -24,4 +23,5 @@ export const Create_Nft = "Create_Nft";
 export const Upload_CoverImg = "Upload_CoverImg";
 export const Upload_AudioFile = "Upload_AudioFile";
 export const PlayList = "PlayList";
+export const Get_Count_ArtistGenres = "Get_Count_ArtistGenres";
 //============================= Export Action Types End =============================

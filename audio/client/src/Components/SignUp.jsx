@@ -9,7 +9,7 @@ import * as Yup from 'yup';
 import {useHistory} from "react-router-dom";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { signUpToggle, signUpUser } from "../Actions/actions";
+import { getAllGenres, signUpUser } from "../Actions/actions";
 toast.configure();
 
 //========================== Import Modules End =============================
@@ -28,7 +28,9 @@ const SignUp = () => {
     //============================= Redux States =============================
     const Toggle = useSelector(state => state.Toggle);
     const Loading = useSelector(state => state.Loading);
-    
+    const Genres = useSelector(state => state.Genres);
+
+    //============================= useStates =============================
     const [genres, setGenres] = useState([]);
     
     const handleClick = (e) => {
@@ -42,7 +44,7 @@ const SignUp = () => {
     const formik = useFormik({
         //============================= Initial Values =============================
         initialValues: {
-          firstName:"", lastName:"", email:"", bio:"", username:"", password:"" , cpassword:"", role:""
+          firstName:"", lastName:"", email:"", bio:"", username:"", password:"" , cpassword:""
         },
         validationSchema: Yup.object().shape({
             firstName: Yup.string()
@@ -54,7 +56,6 @@ const SignUp = () => {
               .max(15, 'Too Long!')
               .required('Required'),
             email: Yup.string().email('Invalid email').required('Required'),
-            role: Yup.string().required('Required'),
             bio: Yup.string()
               .min(10, 'Too Short!')
               .max(500, 'Too Long!')
@@ -93,12 +94,14 @@ const SignUp = () => {
         if(Toggle === true){   
             //============================= Navigate to profile =============================
             history.push('/signIn');
-            dispatch(signUpToggle());
             formik.handleReset();
         }
     }, [Toggle, dispatch])
 
 
+    useEffect(() => {
+        dispatch(getAllGenres(""))
+    }, [dispatch])
     return (
         <>
             <div className="Loading">
@@ -113,14 +116,6 @@ const SignUp = () => {
         
                 <div class="form">
                     <form class="login-form" onSubmit={formik.handleSubmit}>
-
-                    <select {...formik.getFieldProps("role")} value={formik.values.role}  name="role">
-                        <option>Select Role...</option>
-                        <option value={"Artist"}>Artist</option>
-                    </select>
-                    {formik.errors.role && formik.touched.role ? (
-                        <div className = "error">{formik.errors.role}</div>
-                    ) : null}
                     
                     <input {...formik.getFieldProps("firstName")} value={formik.values.firstName}  name="firstName"  type="text" placeholder="firstName"/>
                     {formik.errors.firstName && formik.touched.firstName ? (
@@ -149,15 +144,24 @@ const SignUp = () => {
                     ) : null}
 
                     <h2>Genres</h2>
-                    <label>rock</label><Checkbox type='checkbox' id={"rock"} handleClick = {handleClick} isChecked={genres.includes('rock')}/>
-                    <label>R & B</label><Checkbox type='checkbox' id={"R & B"} handleClick = {handleClick} isChecked={genres.includes('R & B')}/> 
-                    <label>country</label><Checkbox type='checkbox' id={"country"} handleClick = {handleClick} isChecked={genres.includes('country')}/> 
-                    <label>hip-hop</label><Checkbox type='checkbox' id={"hip-hop"} handleClick = {handleClick} isChecked={genres.includes('hip-hop')}/>  
-                    <label>jazz</label><Checkbox type='checkbox' id={"jazz"} handleClick = {handleClick} isChecked={genres.includes('jazz')}/> 
-                    <label>soulMusic</label><Checkbox type='checkbox' id={"soul music"} handleClick = {handleClick} isChecked={genres.includes('soul music')}/> 
-                    <label>danceMusic</label><Checkbox type='checkbox' id={"dance music"} handleClick = {handleClick} isChecked={genres.includes('dance music')}/> 
-                    <label>pop</label><Checkbox type='checkbox' id={"pop"} handleClick = {handleClick} isChecked={genres.includes('pop')}/> 
-
+                    {
+                        Genres && Genres.map(ele => {
+                            return(
+                                <>
+                                    <label>{ele.title}</label>
+                                    <div className="CheckBox">
+                                        <Checkbox 
+                                        type='checkbox' 
+                                        id={ele.title} 
+                                        name={ele.title}
+                                        handleClick = {handleClick} 
+                                        isChecked={genres.includes(ele.title)}/>
+                                    </div>
+                                    
+                                </>
+                            )
+                        })
+                    }
                     <input {...formik.getFieldProps("username")} value={formik.values.username}  name="username"  type="text" placeholder="Username"/>
                     {formik.errors.username && formik.touched.username ? (
                         <div className = "error">{formik.errors.username}</div>

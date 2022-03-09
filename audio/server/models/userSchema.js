@@ -66,7 +66,11 @@ const userSchema = new mongoose.Schema({
             price: {
                 type: String,
                 required: true
-            }
+            },
+            createAt:{
+                type: Date,
+                default: Date.now
+            },
         }
     ],
     Tokens: [

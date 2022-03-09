@@ -39,8 +39,9 @@ const Navbar = () => {
                 <NavLink to = '/genres' className='links'> Genres  </NavLink>
 
                 {
-                    User.role === "Admin" ? (
+                    User && User.role === "Admin" ? (
                         <>
+                            <NavLink to = '/dashboard' className='links'> Dashboard  </NavLink>
                             <NavLink to = '/profile' className='links'> Profile  </NavLink> 
                             <NavLink to = '/createGenres' className='links' > Create Genres </NavLink> 
                             <NavLink to = '/changePassword' className='links'> ChangePassword  </NavLink>
@@ -48,7 +49,7 @@ const Navbar = () => {
                     ) : null
                 }
                 {
-                    User.role === 'Artist' ? (
+                    User && User.role === 'Artist' ? (
                     <>
                         <NavLink to = '/createNft' className='links'> CreateNft  </NavLink> 
                     </>
@@ -58,11 +59,9 @@ const Navbar = () => {
                 {
                     cookie !== undefined && (
                         <>
-                        <NavLink to = '/dashboard' className='links'> Dashboard  </NavLink>
-                        
-                        {
-                            Loading ? null : <NavLink to = '/logout' className='links'> Logout </NavLink>
-                        } 
+                            {
+                                Loading ? null : <NavLink to = '/logout' className='links'> Logout </NavLink>
+                            } 
                             
                         </>
                     )

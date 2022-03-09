@@ -12,6 +12,7 @@ import Profile from '../Components/Profile';
 import SignIn from '../Components/SignIn';
 import SignUp from '../Components/SignUp';
 import createGenres from '../Components/CreateGenres';
+import ArtistPage from '../Components/ArtistPage';
 import {useDispatch, useSelector } from 'react-redux';
 import Cookies from 'js-cookie';
 import ProtectedRoute from '../Components/ProtectedRoute'
@@ -26,8 +27,9 @@ const Routes = () => {
   const cookie = Cookies.get('audioNft'); 
   const User = useSelector(state => state.User);
   const LoginState = useSelector(state => state.LoginState);
-  const dispatch = useDispatch();
 
+  const dispatch = useDispatch();
+ 
   useEffect(() => {
     if(cookie !== undefined){
       dispatch(adminProfile())
@@ -41,25 +43,30 @@ const Routes = () => {
 
             <Route exact path = '/artists' component = {Artists} />
             <Route exact path = '/genres' component = {Genres} />
-            
-            <ProtectedRoute exact path = '/dashboard' component = {Dashboard} authStatus = {cookie}/> 
+            <Route exact path = '/artist/:id' component = {ArtistPage} />
+          
             <ProtectedRoute exact path = '/logout' component = {Logout} authStatus = {cookie}/> 
+
             {
-                User.role === 'Admin' ? (
+              User.role === 'Artist' ? (
                   <>
+                    <ProtectedRoute exact path = '/createNft' component = {CreateNft} authStatus = {cookie}/>
+                    <ProtectedRoute exact path = '/EditArtist/:id' component={SignUp} authStatus = {cookie}/>
+                  </>
+                ) : null
+            }
+            {
+              User.role === 'Admin' ? (
+                  <>
+                    <ProtectedRoute exact path = '/dashboard' component = {Dashboard} authStatus = {cookie}/> 
+                    <ProtectedRoute exact path = '/EditGenres/:id' component={createGenres} authStatus = {cookie}/>
                     <ProtectedRoute exact path = '/changePassword' component = {ChangePassword} authStatus = {cookie}/>
                     <ProtectedRoute exact path = '/profile' component = {Profile} authStatus = {cookie}/>
                     <ProtectedRoute exact path = '/createGenres' component={createGenres} authStatus = {cookie}/>
                   </>
-                ) : <Redirect to='/' />
+                ) : null
             }
-            {
-                User.role === 'Artist' ? (
-                  <>
-                    <ProtectedRoute exact path = '/createNft' component = {CreateNft} authStatus = {cookie}/>
-                  </>
-                ) : <Redirect to='/' />
-            }
+
             {
               User.length === 0 && LoginState === true || cookie === undefined  ? (
                 <>
