@@ -18,6 +18,7 @@ import Cookies from 'js-cookie';
 import ProtectedRoute from '../Components/ProtectedRoute'
 import { adminProfile } from '../Actions/actions';
 import CreateNft from '../Components/CreateNft';
+import EditArtist from '../Components/EditArtist';
 //========================== Import Modules End =============================
 
 //============================= Routes Component Start =============================
@@ -27,7 +28,7 @@ const Routes = () => {
   const cookie = Cookies.get('audioNft'); 
   const User = useSelector(state => state.User);
   const LoginState = useSelector(state => state.LoginState);
-
+  
   const dispatch = useDispatch();
  
   useEffect(() => {
@@ -40,35 +41,21 @@ const Routes = () => {
     <div>
         <Switch>
             <Route exact path = '/' component = {Home}/>
-
             <Route exact path = '/artists' component = {Artists} />
             <Route exact path = '/genres' component = {Genres} />
             <Route exact path = '/artist/:id' component = {ArtistPage} />
-          
+      
             <ProtectedRoute exact path = '/logout' component = {Logout} authStatus = {cookie}/> 
-
+            <ProtectedRoute exact path = '/createNft' component = {CreateNft} authStatus = {cookie}/>
+            <ProtectedRoute exact path = '/EditArtist/:id' component={EditArtist} authStatus = {cookie}/>   
+            <ProtectedRoute exact path = '/dashboard' component = {Dashboard} authStatus = {cookie}/> 
+            <ProtectedRoute exact path = '/EditGenres/:id' component={createGenres} authStatus = {cookie}/>
+            <ProtectedRoute exact path = '/changePassword' component = {ChangePassword} authStatus = {cookie}/>
+            <ProtectedRoute exact path = '/profile' component = {Profile} authStatus = {cookie}/>
+            <ProtectedRoute exact path = '/createGenres' component={createGenres} authStatus = {cookie}/>
+            
             {
-              User.role === 'Artist' ? (
-                  <>
-                    <ProtectedRoute exact path = '/createNft' component = {CreateNft} authStatus = {cookie}/>
-                    <ProtectedRoute exact path = '/EditArtist/:id' component={SignUp} authStatus = {cookie}/>
-                  </>
-                ) : null
-            }
-            {
-              User.role === 'Admin' ? (
-                  <>
-                    <ProtectedRoute exact path = '/dashboard' component = {Dashboard} authStatus = {cookie}/> 
-                    <ProtectedRoute exact path = '/EditGenres/:id' component={createGenres} authStatus = {cookie}/>
-                    <ProtectedRoute exact path = '/changePassword' component = {ChangePassword} authStatus = {cookie}/>
-                    <ProtectedRoute exact path = '/profile' component = {Profile} authStatus = {cookie}/>
-                    <ProtectedRoute exact path = '/createGenres' component={createGenres} authStatus = {cookie}/>
-                  </>
-                ) : null
-            }
-
-            {
-              User.length === 0 && LoginState === true || cookie === undefined  ? (
+              cookie === undefined && LoginState === true ? (
                 <>
                   <Route exact path = '/signUp' component = {SignUp} />
                   <Route exact path = '/signIn' component = {SignIn} />  

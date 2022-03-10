@@ -1,6 +1,6 @@
 //========================== Import Modules Start ===========================
 
-import {SignIn_User, Logout_User, Loading, SignUp_User, Get_All_Artists, Get_All_Genres, Admin_Profile, Change_Password, Edit_Admin,Edit_Genres, Delete_Genres, Create_Genres, Create_Nft, Loading_Error, Upload_AudioFile, Upload_CoverImg, PlayList, Get_Count_ArtistGenres} from "./actionTypes";
+import {SignIn_User, Logout_User, Loading, SignUp_User, Get_All_Artists, Get_All_Genres, Admin_Profile, Change_Password, Edit_Admin,Edit_Genres, Delete_Genres, Create_Genres, Create_Nft, Loading_Error, Upload_AudioFile, Upload_CoverImg, PlayList, Get_Count_ArtistGenres, Edit_Artist} from "./actionTypes";
 import Axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -49,13 +49,13 @@ export const signInUser = (values) => {
 
 //============================= End =============================
 
-//============================= Register User Action Start =============================
+//============================= Get All Artists Action Start =============================
 
-export const getAllArtists = (Page) => {
+export const getAllArtists = (Page,Search) => {
 
     return (dispatch) => {
 
-        Axios.get(`/getAllArtists/?Page=${Page}`)
+        Axios.get(`/getAllArtists/?Page=${Page}&Search=${Search}`)
         .then((res) => {
             dispatch({type: Get_All_Artists, payload: res.data})
         })
@@ -67,13 +67,13 @@ export const getAllArtists = (Page) => {
 
 //============================= End =============================
 
-//============================= Register User Action Start =============================
+//============================= Get All Genres Action Start =============================
 
-export const getAllGenres = (Page) => {
+export const getAllGenres = (Page, Search) => {
 
     return (dispatch) => {
 
-        Axios.get(`/getAllGenres/?Page=${Page}`)
+        Axios.get(`/getAllGenres/?Page=${Page}&Search=${Search}`)
         .then((res) => {
             dispatch({type: Get_All_Genres, payload: res.data})
         })
@@ -85,7 +85,7 @@ export const getAllGenres = (Page) => {
 
 //============================= End =============================
 
-//============================= Register User Action Start =============================
+//============================= Admin Profile Action Start =============================
 
 export const adminProfile = () => {
 
@@ -103,7 +103,7 @@ export const adminProfile = () => {
 
 //============================= End =============================
 
-//============================= Register User Action Start =============================
+//============================= Change Password Action Start =============================
 
 export const changePassword = (values) => {
 
@@ -115,14 +115,14 @@ export const changePassword = (values) => {
             dispatch({type: Change_Password})
         })
         .catch(err => {
-            toast.error("Email Or Username Already Exist!", { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
+            toast.error("Old Password Is Not Correct", { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
         })
     }
 }
 
 //============================= End =============================
 
-//============================= Register User Action Start =============================
+//============================= Edit Admin Action Start =============================
 
 export const editAdmin = (values) => {
 
@@ -141,7 +141,27 @@ export const editAdmin = (values) => {
 
 //============================= End =============================
 
-//============================= Register User Action Start =============================
+//============================= Edit Artist Action Start =============================
+
+export const editArtist = (values,selectGenres, id) => {
+
+    return (dispatch) => {
+
+        Axios.put(`/editArtist/?Id=${id}`, {values,selectGenres})
+        .then((res) => {
+            toast.success(`${res.data.msg}`, { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
+            dispatch({type: Edit_Artist})
+        })
+        .catch(err => {
+            toast.error("Artist already exist!", { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
+        })
+    }
+}
+
+//============================= End =============================
+
+
+//============================= Edit Genres Action Start =============================
 
 export const editGenres = (values, id) => {
 
@@ -160,7 +180,7 @@ export const editGenres = (values, id) => {
 
 //============================= End =============================
 
-//============================= Register User Action Start =============================
+//============================= Delete Genres Action Start =============================
 
 export const deleteGenres = (id) => {
 
@@ -179,7 +199,7 @@ export const deleteGenres = (id) => {
 
 //============================= End =============================
 
-//============================= Register User Action Start =============================
+//============================= Create Genres Action Start =============================
 
 export const createGenres = (values) => {
 
@@ -198,7 +218,7 @@ export const createGenres = (values) => {
 
 //============================= End =============================
 
-//============================= Register User Action Start =============================
+//============================= CreateNft Action Start =============================
 
 export const createNft = (userId, values, AudioFile, CoverImg) => {
 
@@ -221,7 +241,7 @@ export const createNft = (userId, values, AudioFile, CoverImg) => {
 //============================= End =============================
 
 
-//============================= Register User Action Start =============================
+//============================= Upload Cover Image Action Start =============================
 
 export const uploadCoverImg = (values) => {
 
@@ -242,7 +262,7 @@ export const uploadCoverImg = (values) => {
 
 //============================= End =============================
 
-//============================= Register User Action Start =============================
+//============================= Upload Audio File Action Start =============================
 
 export const uploadAudioFile = (values) => {
 
@@ -316,7 +336,7 @@ export const logout = () => {
 //============================= End =============================
 
 
-//============================= Logout Action Start =============================
+//============================= Loading Action Start =============================
 
 export const loading = () => {
 

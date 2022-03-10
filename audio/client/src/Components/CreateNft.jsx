@@ -44,9 +44,9 @@ const CreateNft = () => {
           .max(255, 'Too Long!')
           .required('Required'),
         price: Yup.string()
-            .min(5, 'Too Short!')
-            .max(255, 'Too Long!')
-            .required('Required'),
+          .min(2, 'Too Short!')
+          .max(10, 'Too Long!')
+          .required('Required'),
       }),
       onSubmit: (values) => {
         const formData = new FormData();
@@ -102,7 +102,7 @@ const CreateNft = () => {
                 maxRows={5}
                 aria-label="maximum height"
                 placeholder="description"
-                style={{ width: 350 }}
+                style={{ width: 350, height: 100, marginBottom: 5 }}
                 {...formik.getFieldProps("description")} value={formik.values.description}  name="description"
               />
               {formik.errors.description && formik.touched.description ? (

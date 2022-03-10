@@ -7,16 +7,14 @@ import TextareaAutosize from '@mui/base/TextareaAutosize';
 import Checkbox from "./Checkbox";
 import * as Yup from 'yup';
 import {useHistory} from "react-router-dom";
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { getAllGenres, signUpUser } from "../Actions/actions";
-toast.configure();
+import { editArtist, getAllGenres} from "../Actions/actions";
+import queryString from "query-string";
 
 //========================== Import Modules End =============================
 
 //============================= Register Component Start =============================
 
-const SignUp = () => {
+const EditArtist = () => {
 
         
     //============================= Navigate the Page =============================
@@ -27,17 +25,23 @@ const SignUp = () => {
 
     //============================= Redux States =============================
     const Toggle = useSelector(state => state.Toggle);
-    const Loading = useSelector(state => state.Loading);
+    const User = useSelector(state => state.User);
     const Genres = useSelector(state => state.Genres);
-    
+   
     //============================= useStates =============================
-    const [genres, setGenres] = useState([]);
-    
+    const [selectGenres, setSelectGenres] = useState([]);
+   
+    //============================= Get Edited User Id =============================
+    const {id} = queryString.parse(window.location.search);
+
+    //============================= Store Edite Employee Data =============================
+    const [editedObject,setEditedObject] = useState([]);
+
     const handleClick = (e) => {
         const { id, checked } = e.target;
-        setGenres([...genres, id]);
+        setSelectGenres([...selectGenres, id]);
         if (!checked) {
-          setGenres(genres.filter((item) => item !== id));
+          setSelectGenres(selectGenres.filter((item) => item !== id));
         }
     };
     //============================= UseFormik =============================
@@ -64,50 +68,47 @@ const SignUp = () => {
               .min(3, 'Too Short!')
               .max(30, 'Too Long!')
               .required('Required'), 
-            password: Yup.string()
-              .min(8, 'Too Short!')
-              .required('Required')
-              .matches(
-                /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
-                "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
-                ),  
-            cpassword: Yup.string()
-              .min(8, 'Too Short!')
-              .required('Required')
-              .matches(
-                /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
-                "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
-                ), 
         }),
         onSubmit: (values) => {
-            
-            if(values.password !== values.cpassword){
-                toast.warning("Password Not Match")
-            }
-            else{
-                dispatch(signUpUser(values, genres))
-            }
+            dispatch(editArtist(values, selectGenres, id))
         }
     })
 
     useEffect(() => {
         if(Toggle === true){   
             //============================= Navigate to profile =============================
-            history.push('/signIn');
+            history.push('/artists');
             formik.handleReset();
         }
     }, [Toggle, dispatch])
 
     useEffect(() => {
         dispatch(getAllGenres("", ""))
-    }, [dispatch])
+    }, [dispatch]);
+
+    //============================= UseEffect For Get EditUser Data =============================
+  useEffect(() => {
+    if(id){
+        //============================= Set Edited User Data =============================
+        setEditedObject(User);
+        setSelectGenres(User.genres)
+    }
+  },[id, User]);
+
+  //============================= Set Edited User Data to InitialValues =============================
+  useEffect(() => {
+    if(id && editedObject) {
+        //setvalues
+        formik.setValues(editedObject)
+    }
+  },[editedObject]);
     return (
         <>
             <div className="Loading">
             </div>
             <div class="login-page">
                 <div className="header_div">
-                    <h1> Artist Form</h1>
+                    <h1> Edit Artist</h1>
                 </div>
         
                 <div class="form">
@@ -118,7 +119,7 @@ const SignUp = () => {
                         <div className = "error">{formik.errors.firstName}</div>
                     ) : null}
 
-                    <input {...formik.getFieldProps("lastName")} value={formik.values.nalastNameme}  name="lastName"  type="text" placeholder="lastName"/>
+                    <input {...formik.getFieldProps("lastName")} value={formik.values.lastName}  name="lastName"  type="text" placeholder="lastName"/>
                     {formik.errors.lastName && formik.touched.lastName ? (
                         <div className = "error">{formik.errors.lastName}</div>
                     ) : null}
@@ -141,7 +142,7 @@ const SignUp = () => {
 
                     <h2>Genres</h2>
                     {
-                        Genres && Genres.map(ele => {
+                        Genres && selectGenres !== undefined && Genres.map(ele => {
                             return(
                                 <>
                                     <label>{ele.title}</label>
@@ -151,7 +152,8 @@ const SignUp = () => {
                                         id={ele.title} 
                                         name={ele.title}
                                         handleClick = {handleClick} 
-                                        isChecked={genres.includes(ele.title)}/>
+                                        isChecked={selectGenres.includes(ele.title)}
+                                        />
                                     </div>
                                     
                                 </>
@@ -163,20 +165,8 @@ const SignUp = () => {
                         <div className = "error">{formik.errors.username}</div>
                     ) : null}
                     
-                    <input {...formik.getFieldProps("password")} value={formik.values.password}  name="password"  type="password" placeholder="password"/>
-                    {formik.errors.password && formik.touched.password ? (
-                        <div className = "error">{formik.errors.password}</div>
-                    ) : null}
-                    
-                    <input {...formik.getFieldProps("cpassword")} value={formik.values.cpassword}  name="cpassword"  type="password" placeholder="Confirm Password"/>
-                    {formik.errors.cpassword && formik.touched.cpassword ? (
-                        <div className = "error">{formik.errors.cpassword}</div>
-                    ) : null}
-
-                    <button type="submit"> Submit </button>
+                    <button type="submit"> Update </button>
                     </form>
-                    
-                    <p class="message">Already registered? <a href="/signIn">Sign In</a></p>
                             
                 </div>
             </div>
@@ -188,6 +178,6 @@ const SignUp = () => {
 
 //============================= Export Default Start =============================
 
-export default SignUp;
+export default EditArtist;
 
 //============================= Export Default End =============================

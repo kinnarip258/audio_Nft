@@ -24,7 +24,7 @@ const CreateGenres = () => {
   //============================= Get Edited User Id =============================
   const {id} = queryString.parse(window.location.search);
 
-  //============================= Store Edite Employee Data =============================
+  //============================= Store Edit Employee Data =============================
   const [editedObject,setEditedObject] = useState([]);
 
   const history = useHistory();
@@ -99,7 +99,7 @@ const CreateGenres = () => {
                 maxRows={5}
                 aria-label="maximum height"
                 placeholder="description"
-                style={{ width: 350 }}
+                style={{ width: 350 , height: 100, marginBottom: 5}}
                 {...formik.getFieldProps("description")} value={formik.values.description}  name="description"
               />
               

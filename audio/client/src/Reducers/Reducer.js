@@ -1,6 +1,6 @@
 //========================== Import Modules Start ===========================
 
-import { SignIn_User, Logout_User, Loading, SignUp_User, Get_All_Artists, Get_All_Genres, Admin_Profile, Change_Password, Edit_Admin, Edit_Genres, Delete_Genres, Create_Genres, Create_Nft, Upload_CoverImg, Upload_AudioFile, Loading_Error, PlayList, Get_Count_ArtistGenres } from "../Actions/actionTypes";
+import { SignIn_User, Logout_User, Loading, SignUp_User, Get_All_Artists, Get_All_Genres, Admin_Profile, Change_Password, Edit_Admin, Edit_Genres, Delete_Genres, Create_Genres, Create_Nft, Upload_CoverImg, Upload_AudioFile, Loading_Error, PlayList, Get_Count_ArtistGenres, Edit_Artist } from "../Actions/actionTypes";
 
 //========================== Import Modules End =============================
 
@@ -41,7 +41,8 @@ const Reducer = (state = initialState, action) => {
             return {
                 ...state,
                 Artists: action.payload.artists,
-                ArtistPage: action.payload.totalPage
+                ArtistPage: action.payload.totalPage,
+                Toggle:false
             }
         
         case Get_All_Genres: 
@@ -64,6 +65,7 @@ const Reducer = (state = initialState, action) => {
         case Change_Password: 
             return {
                 ...state,
+                Toggle: true
             }
         
         case Edit_Admin: 
@@ -72,6 +74,11 @@ const Reducer = (state = initialState, action) => {
                 Toggle: true
             }
 
+        case Edit_Artist:
+            return {
+                ...state,
+                // Toggle: true
+            }
         case Edit_Genres: 
             return {
                 ...state,

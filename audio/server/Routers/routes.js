@@ -143,15 +143,12 @@ router.get('/getAllArtists', async (req,res) => {
     try{
 
         const Page = req.query.Page;
+        const Search = req.query.Search;
         const Limit = 2;
         let skip = (Page-1) * Limit;
 
-        //============================= Count Total Documents =============================
-        const total = await User.countDocuments({});
-        
-        //============================= Count Total Pages =============================
-        let totalPage = Math.ceil((total - 1) /Limit);
         let aggregateQuery = [];
+
 
         aggregateQuery.push(
             {
@@ -159,20 +156,69 @@ router.get('/getAllArtists', async (req,res) => {
                     role: 'Artist'
                 }
             },
-            {
-                $sort: { createAt: -1}
-            },
-            //============================= Pagination =============================
-            {
-                $skip: skip
-            },
-            {
-                $limit: Limit
-            }  
-        )
-        const artists = await User.aggregate([aggregateQuery]);
+        );
         
-        res.send({artists, totalPage})
+        if(Page !== "" && Search === "") {
+            //============================= Count Total Documents =============================
+            const total = await User.countDocuments({});
+            
+            //============================= Count Total Pages =============================
+            let totalPage = Math.ceil((total - 1) /Limit);
+
+            aggregateQuery.push(
+                {
+                    $sort: { createAt: -1}
+                },
+                //============================= Pagination =============================
+                {
+                    $skip: skip
+                },
+                {
+                    $limit: Limit
+                }  
+            )
+
+            const artists = await User.aggregate([aggregateQuery]);
+            
+            res.send({artists, totalPage})
+        }
+        else if(Page !== "" && Search !== "") {
+            aggregateQuery.push(
+                {
+                    $match: {
+                        $or: [
+                            {username: RegExp("^" + Search, 'i')},
+                            {email: RegExp("^" + Search, 'i')},
+                        ] 
+
+                    }
+                }
+            )
+
+            const matchUser = await User.aggregate([aggregateQuery]);
+
+            //============================= Count Total Pages of SearchUser =============================
+            let totalPage = Math.ceil((matchUser.length - 1)/Limit);
+
+            aggregateQuery.push(
+                {
+                    $sort: { createAt: -1}
+                },
+                //============================= Pagination =============================
+                {
+                    $skip: skip
+                },
+                {
+                    $limit: Limit
+                }  
+            )
+
+            const artists = await User.aggregate([aggregateQuery]);
+            
+            res.send({artists, totalPage})
+        }
+        
+        
     }
     catch(err){
         //============================= Send Error Message =============================
@@ -187,22 +233,26 @@ router.get('/getAllGenres', async (req,res) => {
     try{
 
         const Page = req.query.Page;
+        const Search = req.query.Search;
         const Limit = 5;
         let skip = (Page-1) * Limit;
+
         let aggregateQuery = [];
 
-        //============================= Count Total Documents =============================
-        const total = await Genres.countDocuments({});
-        
-        //============================= Count Total Pages =============================
-        let totalPage = Math.ceil(total/Limit);
-
-        if(Page === "") {
+        if(Page === "" && Search === ""){
+            
             const genres = await Genres.find();
 
-            res.send({genres})
+            res.send({genres});
         }
-        else {
+        if(Page !== "" && Search === "") {
+
+            //============================= Count Total Documents =============================
+            const total = await Genres.countDocuments({});
+            
+            //============================= Count Total Pages =============================
+            let totalPage = Math.ceil(total/Limit);
+
             aggregateQuery.push(
                 {
                     $sort: { createAt: -1}
@@ -214,10 +264,39 @@ router.get('/getAllGenres', async (req,res) => {
                 {
                     $limit: Limit
                 }  
-            );  
+            )
+
+            const genres = await Genres.aggregate([aggregateQuery]);
+
+            res.send({genres, totalPage});
+        }
+        else if (Page !== "" || Search !== ""){
+        
+            aggregateQuery.push(
+                {
+                    $match: {title: RegExp("^" + Search, 'i')}
+                },
+            )
+            const matchUser = await Genres.aggregate([aggregateQuery]);
+           
+            //============================= Count Total Pages of SearchUser =============================
+            let totalPage = Math.ceil((matchUser.length)/Limit);
+
+            aggregateQuery.push(
+                {
+                    $sort: { createAt: -1}
+                },
+                //============================= Pagination =============================
+                {
+                    $skip: skip
+                },
+                {
+                    $limit: Limit
+                }  
+            )
             
             const genres = await Genres.aggregate([aggregateQuery]);
-        
+                
             res.send({genres, totalPage});
         }
         
@@ -236,9 +315,9 @@ router.post('/changePassword', authenticate, async (req,res) => {
         const {newPassword, oldPassword} = req.body;
         
         const user = req.authenticateUser;
-
-        const MatchPassword = bcrypt.compare(oldPassword, user.password);
         
+        const MatchPassword = await bcrypt.compare(oldPassword, user.password);
+
         if(MatchPassword){
             password = await bcrypt.hash(newPassword, 10);
 
@@ -247,13 +326,12 @@ router.post('/changePassword', authenticate, async (req,res) => {
             res.send({msg: "Password Change Successfully!"})
         }
         else{
-            res.send({error: "Old Password Is Not Correct!"})
+            res.status(400).send({error: "Old Password Is Not Correct!"})
         }
     }
     catch(err){
         //============================= Send Error Message =============================
         res.send(err);
-        res.send({error: "Old Password Is Not Correct!"})
     }
 });
 
@@ -263,12 +341,61 @@ router.post('/changePassword', authenticate, async (req,res) => {
 router.put('/editAdmin', authenticate, async (req,res) => {
     try{
 
-        //============================= Save Employee Updated Details =============================
         await User.findOneAndUpdate({username: req.authenticateUser.username}, req.body, {
             new: false
         });
 
         res.send({msg: 'Admin Profile Updated!'});
+
+    }
+    catch(err){
+        //============================= Send Error Message =============================
+        res.send(err)
+    }
+});
+
+//============================= Edit Admin =============================
+
+router.put('/editArtist', authenticate, async (req,res) => {
+    try{
+
+        const values = req.body.values;
+        const selectGenres = req.body.selectGenres;
+
+        if(req.authenticateUser.username !== values.username){
+
+            const ArtistExist = await User.findOne({username: req.authenticateUser.username});
+
+            if(ArtistExist){
+
+                return res.status(400).send({error: "Artist already exist!"});
+            }
+            else {
+                console.log("else");
+                await User.updateOne({_id: req.query.Id}, {$set: {"genres.$": selectGenres}});
+                
+                await User.findOneAndUpdate({_id: req.query.Id}, values, {
+                    new: false
+                });
+                
+                res.send({msg: 'Artist Updated Successfully!'});
+            }
+            
+        }
+
+        else {
+            
+            console.log("selectGenres", selectGenres);
+            
+           await User.updateOne({_id: req.query.Id}, {$set: {"genres.$": selectGenres}});
+           
+
+            await User.findOneAndUpdate({_id: req.query.Id}, values, {
+                new: false
+            });
+            
+            res.send({msg: 'Artist Updated Successfully!'});
+        }
 
     }
     catch(err){
@@ -283,7 +410,6 @@ router.put('/editGenres', authenticate, async (req,res) => {
     try{
         const Id = req.query.Id;
         
-        //============================= Save Employee Updated Details =============================
         await Genres.findOneAndUpdate({_id: Id}, req.body, {
             new: false
         });
@@ -301,7 +427,6 @@ router.put('/editGenres', authenticate, async (req,res) => {
 router.delete('/deleteGenres', authenticate, async (req,res) => {
     try{
 
-       //============================= Delete Article Data =============================
        await Genres.findByIdAndDelete(req.query.Id);
 
         //============================= Send Response =============================

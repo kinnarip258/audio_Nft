@@ -3,16 +3,18 @@
 import React from 'react'
 import {Route, Redirect} from 'react-router-dom';
 
+
 //========================== Import Modules End =============================
 
 //============================= Protected Route Component Start =============================
 
 const ProtectedRoute = ({authStatus, component: Component, ...rest}) => { 
     
+    
     return (
         <>  
             <Route {...rest} render= {(props) => {
-                if(authStatus !== undefined) {
+                if(authStatus !== undefined){
                     return <Component {...props}/>;
                 }
                 else{

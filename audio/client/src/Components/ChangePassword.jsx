@@ -1,12 +1,13 @@
 //========================== Import Modules Start ===========================
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import {useFormik} from "formik";
 import * as Yup from 'yup';
-import { useDispatch} from 'react-redux';
+import { useDispatch, useSelector} from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { changePassword } from '../Actions/actions';
+import {useHistory} from 'react-router-dom';
 toast.configure();
 //========================== Import Modules End =============================
 
@@ -17,6 +18,10 @@ const ChangePassword = () => {
   //============================= dispatch Api Request =============================
   const dispatch = useDispatch();
 
+  const history = useHistory();
+
+  const Toggle = useSelector(state => state.Toggle);
+
   //============================= UseFormik =============================
   const formik = useFormik({
       //============================= Initial Values =============================
@@ -26,26 +31,41 @@ const ChangePassword = () => {
       validationSchema: Yup.object().shape({
         newPassword: Yup.string()
           .min(8, 'Too Short!')
-          .max(100, 'Too Long!')
-          .required('Required'), 
+          .required('Required')
+          .matches(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
+            "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
+            ), 
         oldPassword: Yup.string()
           .min(8, 'Too Short!')
-          .max(100, 'Too Long!')
-          .required('Required'),
+          .required('Required')
+          .matches(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
+            "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
+            ), 
         confirmPassword: Yup.string()
           .min(8, 'Too Short!')
-          .max(100, 'Too Long!')
-          .required('Required'), 
+          .required('Required')
+          .matches(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
+            "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
+            ),  
       }),
       onSubmit: (values) => {
         if(values.newPassword !== values.confirmPassword){
-          toast.warning("Password Not Match", { position: toast.POSITION.TOP_CENTER, autoClose: 2000 })
+          toast.warning("New Password And Confirm Password Not Match", { position: toast.POSITION.TOP_CENTER, autoClose: 2000 })
         }
         else{
           dispatch(changePassword(values))
         }
       }
   })
+
+  useEffect(() => {
+    if(Toggle === true){
+      history.push('/profile')
+    }
+  }, [Toggle])
   return (
     <div>
         <div class="login-page">
