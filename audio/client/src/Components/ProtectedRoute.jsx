@@ -3,13 +3,11 @@
 import React from 'react'
 import {Route, Redirect} from 'react-router-dom';
 
-
 //========================== Import Modules End =============================
 
 //============================= Protected Route Component Start =============================
 
 const ProtectedRoute = ({authStatus, component: Component, ...rest}) => { 
-    
     
     return (
         <>  

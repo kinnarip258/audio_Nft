@@ -78,7 +78,7 @@ const CreateGenres = () => {
   },[editedObject]);
 
   useEffect(() => {
-    dispatch(getAllGenres(""))
+    dispatch(getAllGenres("", ""))
   }, [dispatch])
 
   return (

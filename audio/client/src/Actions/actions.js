@@ -130,11 +130,12 @@ export const editAdmin = (values) => {
 
         Axios.put(`/editAdmin`, values)
         .then((res) => {
-            toast.success(`${res.data.msg}`, { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
-            dispatch({type: Edit_Admin})
+            toast.success(`Admin Profile Updated!`, { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
+            dispatch({type: Edit_Admin, payload: res.data})
         })
         .catch(err => {
             console.log(err);
+            toast.error("Username already exist!", { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
         })
     }
 }
@@ -149,8 +150,8 @@ export const editArtist = (values,selectGenres, id) => {
 
         Axios.put(`/editArtist/?Id=${id}`, {values,selectGenres})
         .then((res) => {
-            toast.success(`${res.data.msg}`, { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
-            dispatch({type: Edit_Artist})
+            toast.success(`Artist Updated Successfully!`, { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });
+            dispatch({type: Edit_Artist, payload: res.data})
         })
         .catch(err => {
             toast.error("Artist already exist!", { position: toast.POSITION.TOP_CENTER, autoClose: 2000 });

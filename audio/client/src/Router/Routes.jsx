@@ -26,7 +26,6 @@ import EditArtist from '../Components/EditArtist';
 const Routes = () => {
 
   const cookie = Cookies.get('audioNft'); 
-  const User = useSelector(state => state.User);
   const LoginState = useSelector(state => state.LoginState);
   
   const dispatch = useDispatch();

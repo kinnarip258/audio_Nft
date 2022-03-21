@@ -48,7 +48,7 @@ const EditArtist = () => {
     const formik = useFormik({
         //============================= Initial Values =============================
         initialValues: {
-          firstName:"", lastName:"", email:"", bio:"", username:"", password:"" , cpassword:""
+          firstName:"", lastName:"", email:"", bio:"", password:"" , cpassword:""
         },
         validationSchema: Yup.object().shape({
             firstName: Yup.string()
@@ -64,10 +64,6 @@ const EditArtist = () => {
               .min(10, 'Too Short!')
               .max(500, 'Too Long!')
               .required('Required'),
-            username: Yup.string()
-              .min(3, 'Too Short!')
-              .max(30, 'Too Long!')
-              .required('Required'), 
         }),
         onSubmit: (values) => {
             dispatch(editArtist(values, selectGenres, id))
@@ -160,10 +156,6 @@ const EditArtist = () => {
                             )
                         })
                     }
-                    <input {...formik.getFieldProps("username")} value={formik.values.username}  name="username"  type="text" placeholder="Username"/>
-                    {formik.errors.username && formik.touched.username ? (
-                        <div className = "error">{formik.errors.username}</div>
-                    ) : null}
                     
                     <button type="submit"> Update </button>
                     </form>

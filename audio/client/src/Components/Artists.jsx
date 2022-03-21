@@ -45,7 +45,7 @@ const Artists = () => {
             return(
               <>
                   <div className="artist">
-                    <label>Username</label>
+                    <label>Username</label>                                                       
                     <p>{artist.username}</p>
                     <label>Bio</label>
                     <p>{artist.bio}</p>

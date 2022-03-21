@@ -34,7 +34,7 @@ const Reducer = (state = initialState, action) => {
 
             return{
                 ...state,
-                LoginState : false
+                LoginState : false,                     
             }
 
         case Get_All_Artists: 
@@ -71,13 +71,15 @@ const Reducer = (state = initialState, action) => {
         case Edit_Admin: 
             return {
                 ...state,
-                Toggle: true
+                Toggle: true,
+                User: action.payload
             }
 
         case Edit_Artist:
             return {
                 ...state,
-                // Toggle: true
+                Toggle: true,
+                User: action.payload
             }
         case Edit_Genres: 
             return {

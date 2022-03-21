@@ -76,7 +76,7 @@ router.post('/signIn', async (req,res) => {
                     expires: new Date(Date.now() + 3600000),
                 });
                 //============================= Send Login User =============================
-                res.send({msg: "User Login Successfully!"});
+                res.send({msg: "User Login Successfully!", userLogin});
             }
         }
         else{
@@ -198,7 +198,7 @@ router.get('/getAllArtists', async (req,res) => {
             const matchUser = await User.aggregate([aggregateQuery]);
 
             //============================= Count Total Pages of SearchUser =============================
-            let totalPage = Math.ceil((matchUser.length - 1)/Limit);
+            let totalPage = Math.ceil((matchUser.length)/Limit);
 
             aggregateQuery.push(
                 {
@@ -341,12 +341,13 @@ router.post('/changePassword', authenticate, async (req,res) => {
 router.put('/editAdmin', authenticate, async (req,res) => {
     try{
 
-        await User.findOneAndUpdate({username: req.authenticateUser.username}, req.body, {
+        
+        const updatedAdmin = await User.findOneAndUpdate({email: req.authenticateUser.email}, req.body, {
             new: false
         });
-
-        res.send({msg: 'Admin Profile Updated!'});
-
+    
+        res.send(updatedAdmin);
+        
     }
     catch(err){
         //============================= Send Error Message =============================
@@ -359,44 +360,20 @@ router.put('/editAdmin', authenticate, async (req,res) => {
 router.put('/editArtist', authenticate, async (req,res) => {
     try{
 
-        const values = req.body.values;
-        const selectGenres = req.body.selectGenres;
+        const genres = req.body.selectGenres;
+        
+        const {_id, firstName, lastName, email, bio, username, password, role} = req.body.values;
 
-        if(req.authenticateUser.username !== values.username){
-
-            const ArtistExist = await User.findOne({username: req.authenticateUser.username});
-
-            if(ArtistExist){
-
-                return res.status(400).send({error: "Artist already exist!"});
-            }
-            else {
-                console.log("else");
-                await User.updateOne({_id: req.query.Id}, {$set: {"genres.$": selectGenres}});
-                
-                await User.findOneAndUpdate({_id: req.query.Id}, values, {
-                    new: false
-                });
-                
-                res.send({msg: 'Artist Updated Successfully!'});
-            }
-            
+        const updatedValues = {
+            _id, firstName, lastName, email, bio, username, password, role, genres
         }
-
-        else {
-            
-            console.log("selectGenres", selectGenres);
-            
-           await User.updateOne({_id: req.query.Id}, {$set: {"genres.$": selectGenres}});
            
-
-            await User.findOneAndUpdate({_id: req.query.Id}, values, {
-                new: false
-            });
+        const updatedUser = await User.findOneAndUpdate({_id: req.query.Id}, updatedValues , {
+            new: false
+        });
+                
+        res.send(updatedUser);
             
-            res.send({msg: 'Artist Updated Successfully!'});
-        }
-
     }
     catch(err){
         //============================= Send Error Message =============================
@@ -551,7 +528,6 @@ router.post('/uploadImg', authenticate, upload.single('image') , async (req,res)
 router.post('/uploadAudioFile', authenticate, upload.single('audio') , async (req,res) => {
 
     try{
-        
 
         const file = req.file;
 
